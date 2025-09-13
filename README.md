@@ -1,5 +1,7 @@
 # pizza_sale
-# 🛒 Retail Sales Analysis with SQL :-
+# 🍕 Pizza Sales Analysis :-
+
+📊 Analyzing pizza sales data to uncover customer preferences, sales trends, and insights using SQL & data visualization tools. Sales Analysis with SQL :-
 
 ## 📌 Project Overview
 
@@ -11,20 +13,20 @@ This project explores retail sales data using SQL to uncover insights such as :
 - Store - level performance
 -  Level: Beginner
 
-This project is designed to demonstrate SQL skills and techniques typically used by data analysts to explore, clean, and analyze retail sales data. The project involves setting up a retail sales database, performing exploratory data analysis (EDA), and answering specific business questions through SQL queries. This project is ideal for those who are starting their journey in data analysis and want to build a solid foundation in SQL.
-The goal is to demonstrate SQL querying, data analysis, and business intelligence skills by analyzing real-world retail sales patterns.
+This project is designed to demonstrate SQL skills and techniques typically used by data analysts to explore, clean, and analyze pizza sales data. The project involves setting up a pizza sales database, performing exploratory data analysis (EDA), and answering specific business questions through SQL queries. This project is ideal for those who are starting their journey in data analysis and want to build a solid foundation in SQL.
+The goal is to demonstrate SQL querying, data analysis, and business intelligence skills by analyzing real-world  sales patterns.
 
 
 
 ## 📂 Dataset :-
 The dataset used is:
-📄 SQL - "Retail Sales Analysis_utf.csv"
+📄 SQL - "pizza_sales"
 
 ## It includes fields like:
-- TransactionID  – Unique transaction reference
+- pizza_type_id  – Unique type_id reference
 - Date  – Transaction date
-- CustomerID  – Customer identifier
-- Product  – Item purchased
+- Revenue  – revenue sales
+- category  – Classic , Supreme , Veggie
 - Quantity  – Units sold
 - Price  – Price per unit
 - TotalAmount  – Transaction amount
@@ -35,7 +37,7 @@ The dataset used is:
 
 
 ## Objectives:-
-   Set up a retail sales database: Create and populate a retail sales database with the provided sales data.
+   Set up a pizza_hut sales database: Create and populate a retail sales database with the provided sales data.
 
 ### 📑Data Cleaning:   
   Identify and remove any records with missing or null values.
@@ -52,107 +54,58 @@ Use SQL to answer specific business questions and derive insights from the sales
 
 # 💻 Project Structure
 1. Database Setup
-Database Creation: The project starts by creating a database named p1_retail_db.
-Table Creation: A table named retail_sales is created to store the sales data.
-The table structure includes columns for transaction ID, sale date, sale time, customer ID, gender, age, product category, quantity sold, price per unit, cost of goods sold (COGS), and total sale amount.
-
-```sql
-   
-       CREATE DATABASE Sales;
-                 
-        CREATE TABLE Sales02
-        (
-           transactions_id INT PRIMARY KEY,
-           sale_date DATE,	
-           sale_time TIME,
-           customer_id INT,	
-           gender VARCHAR(10),
-           age INT,
-           category VARCHAR(35),
-           quantity INT,
-           price_per_unit FLOAT,	
-           cogs FLOAT,
-           total_sale FLOAT
-       );
-
-```
-
-# 2. Data Exploration & Cleaning:-
-   - Record Count: Determine the total number of records in the dataset.
-   - Customer Count: Find out how many unique customers are in the dataset.
-  - Category Count: Identify all unique product categories in the dataset.
-  - Null Value Check: Check for any null values in the dataset and delete records with missing data.
-
-    ```sql
-
-               SELECT COUNT(*) FROM retail_sales;
-               SELECT COUNT(DISTINCT customer_id) FROM retail_sales;
-               SELECT DISTINCT category FROM retail_sales;
-         
-         SELECT * FROM sales02;
-         WHERE 
-             sale_date IS NULL OR sale_time IS NULL OR customer_id IS NULL OR 
-             gender IS NULL OR age IS NULL OR category IS NULL OR 
-             quantity IS NULL OR price_per_unit IS NULL OR cogs IS NULL;
-         
-         DELETE FROM sales02
-         WHERE 
-             sale_date IS NULL OR sale_time IS NULL OR customer_id IS NULL OR 
-             gender IS NULL OR age IS NULL OR category IS NULL OR 
-             quantity IS NULL OR price_per_unit IS NULL OR cogs IS NULL;
-
-    ```
-
-3. Data Analysis & Findings
+Database Creation: The project starts by creating a database named pizza_hut.
+Table Creation: A table named orders , order_details , pizza_types , pizzas is created to store the sales data.
+The table structure includes columns for order_id, sale date, sale time, pizza_type_id, qunatity, category, quantity sold, price per unit and total sale amount.
+       
+2. Data Analysis & Findings
 The following SQL queries were developed to answer specific business questions:
 
-   1.Write a SQL query to retrieve all columns for sales made on '2022-11-05:
+ 1.Retrieve the total number of orders placed.
    ```sql
-
-          SELECT *
-          FROM retail_sales
-          WHERE sale_date = '2022-11-05';
+            select count(*)  as 'Total_orders' 
+            from orders;
 
    ```
-2.Write a SQL query to retrieve all transactions where the category is 'Clothing' and the quantity sold is more than 4 in the month of Nov-2022:
+2.Calculate the total revenue generated from pizza sales.:
 ```sql
-     SELECT 
-       *
-     FROM retail_sales
-     WHERE 
-         category = 'Clothing'
-         AND 
-         TO_CHAR(sale_date, 'YYYY-MM') = '2022-11'
-         AND
-         quantity >= 4
+       SELECT 
+       ROUND(SUM((quantity * price)), 2) AS 'Total_revenue'
+   FROM
+       order_details AS o
+   JOIN   
+        pizzas AS p 
+   ON o.pizza_id = p.pizza_id;
 
 ```
-3.Write a SQL query to calculate the total sales (total_sale) for each category.
+ 3.Identify the highest-priced pizza.
 
 ```sql
-     SELECT 
-         category,
-         SUM(total_sale) as net_sale,
-         COUNT(*) as total_orders
-     FROM retail_sales
-     GROUP BY 1
-```
-
-
-4.Write a SQL query to find the average age of customers who purchased items from the 'Beauty' category.
-```sql
-    
-    SELECT
-        ROUND(AVG(age), 2) as avg_age
-    FROM retail_sales
-    WHERE category = 'Beauty'
-    Write a SQL query to find all transactions where the total_sale is greater than 1000.:
-    SELECT * FROM retail_sales
-    WHERE total_sale > 1000
+   SELECT 
+    name, price
+FROM
+    pizza_types pt
+        JOIN
+    pizzas p ON pt.pizza_type_id = p.pizza_type_id
+ORDER BY price DESC
+LIMIT 1;
 ```
 
 
-5.Write a SQL query to find the total number of transactions (transaction_id) made by each gender in each category.
+ 4.Identify the most common pizza size ordered.
+```sql
+    SELECT 
+    size, COUNT(order_id) AS 'Order_count'
+FROM
+    pizzas
+        JOIN
+    order_details ON pizzas.pizza_id = order_details.pizza_id
+GROUP BY size
+ORDER BY order_count DESC;
+```
+
+
+5.List the top 5 most ordered pizza types along with their quantities.
 ```sql    
     SELECT 
         category,
@@ -168,56 +121,43 @@ The following SQL queries were developed to answer specific business questions:
 
 6.Write a SQL query to calculate the average sale for each month. Find out best selling month in each year.
 ```sql
-     SELECT 
-            year,
-            month,
-         avg_sale
-     FROM 
-     (    
-     SELECT 
-         EXTRACT(YEAR FROM sale_date) as year,
-         EXTRACT(MONTH FROM sale_date) as month,
-         AVG(total_sale) as avg_sale,
-         RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC) as rank
-     FROM retail_sales
-     GROUP BY 1, 2
-     ) as t1
-     WHERE rank = 1
-     **Write a SQL query to find the top 5 customers based on the highest total sales **:
-     SELECT 
-         customer_id,
-         SUM(total_sale) as total_sales
-     FROM retail_sales
-     GROUP BY 1
-     ORDER BY 2 DESC
-     LIMIT 5
+   SELECT 
+    name, SUM(quantity) AS 'Quantity'
+FROM
+    pizza_types
+        JOIN
+    pizzas ON pizza_types.pizza_type_id = pizzas.pizza_type_id
+        JOIN
+    order_details ON order_details.pizza_id = pizzas.pizza_id
+GROUP BY name
+ORDER BY quantity DESC
+LIMIT 5;
+
 ```
 
-7.Write a SQL query to find the number of unique customers who purchased items from each category.:
+## INTERMEDIATE :-
+1.Join the necessary tables to find the total quantity of each pizza category ordered.
  
 ```sql   
-    SELECT 
-        category,    
-        COUNT(DISTINCT customer_id) as cnt_unique_cs
-    FROM retail_sales
-    GROUP BY category
-    Write a SQL query to create each shift and number of orders (Example Morning <12, Afternoon Between 12 & 17, Evening >17):
-    WITH hourly_sale
-    AS
-    (
-    SELECT *,
-        CASE
-            WHEN EXTRACT(HOUR FROM sale_time) < 12 THEN 'Morning'
-            WHEN EXTRACT(HOUR FROM sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
-            ELSE 'Evening'
-        END as shift
-    FROM retail_sales
-    )
-    SELECT 
-        shift,
-        COUNT(*) as total_orders    
-    FROM hourly_sale
-    GROUP BY shift
+   SELECT DISTINCT
+    category, SUM(quantity) AS 'Total_quantity'
+FROM
+    pizza_types
+        JOIN
+    pizzas ON pizza_types.pizza_type_id = pizzas.pizza_type_id
+        JOIN
+    order_details ON order_details.pizza_id = pizzas.pizza_id
+GROUP BY category
+ORDER BY total_quantity DESC;
+
+-- 2.Determine the distribution of orders by hour of the day.
+-- Orders by hour of the day
+-- Step1-  extract hours from order_time
+SELECT 
+    HOUR(time) AS hours, COUNT(order_id) AS 'Order_count'
+FROM
+    orders
+GROUP BY hours;
 ```
 
 ## Findings:-
@@ -232,7 +172,7 @@ The following SQL queries were developed to answer specific business questions:
   The analysis identifies the top-spending customers and the most popular product categories.
   Reports
 - Sales Summary:
-  A detailed report summarizing total sales, customer demographics, and category performance.
+  A detailed report summarizing total sales, revenue demographics, and category performance.
 - Trend Analysis:
   Insights into sales trends across different months and shifts.
 - Customer Insights:
@@ -240,11 +180,9 @@ The following SQL queries were developed to answer specific business questions:
 
 ## 🎯 Project Highlights
 
-✔️ Practical retail dataset
+✔️ Practical pizza_sale dataset
 
 ✔️ SQL for business insights
-
-✔️ Easy to extend with BI dashboards
 
 ✔️ Beginner-friendly but expandable for advanced analysis
 
